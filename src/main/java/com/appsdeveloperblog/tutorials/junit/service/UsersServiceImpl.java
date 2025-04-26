@@ -55,22 +55,22 @@ public class UsersServiceImpl implements UsersService {
         return returnValue;
     }
 
-    @Override
-    public List<UserDto> getUsers(int page, int limit) {
-        List<UserDto> returnValue = new ArrayList<>();
+        @Override
+        public List<UserDto> getUsers(int page, int limit) {
+            List<UserDto> returnValue = new ArrayList<>();
 
-        if (page > 0) page -=1;
+            if (page > 0) page -=1;
 
-        Pageable pageableRequest = PageRequest.of(page, limit);
+            Pageable pageableRequest = PageRequest.of(page, limit);
 
-        Page<UserEntity> usersPage = usersRepository.findAll(pageableRequest);
-        List<UserEntity> users = usersPage.getContent();
+            Page<UserEntity> usersPage = usersRepository.findAll(pageableRequest);
+            List<UserEntity> users = usersPage.getContent();
 
-        Type listType = new TypeToken<List<UserDto>>() {}.getType();
-        returnValue = new ModelMapper().map(users, listType);
+            Type listType = new TypeToken<List<UserDto>>() {}.getType();
+            returnValue = new ModelMapper().map(users, listType);
 
-        return returnValue;
-    }
+            return returnValue;
+        }
 
     @Override
     public UserDto getUser(String email) {
