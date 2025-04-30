@@ -1,0 +1,35 @@
+stages:
+  - build
+  - push
+  - deploy
+
+variables:
+  IMAGE_NAME: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+
+before_script:
+  - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+build:
+  stage: build
+  script:
+    - docker build -t $IMAGE_NAME .
+    - docker images
+
+push:
+  stage: push
+  script:
+    - docker push $IMAGE_NAME
+
+deploy:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  only:
+    - main
+  script:
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
+    - export KUBECONFIG=$CI_PROJECT_DIR/kubeconfig
+    - kubectl config use-context my-context
+    - kubectl set image deployment/my-app my-app=$IMAGE_NAME --namespace=default
+    - kubectl rollout status deployment/my-app
